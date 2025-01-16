@@ -1,0 +1,5 @@
+<div class="d-flex justify-content-center align-items-center" [class.flex-column]='!inline'>
+    <i class="{{icon}}" *ngIf="icon_show == true"></i>
+    <div class="{{title}}" [class.ms-2]='inline' *ngIf="title_show == true">{{title_text}}</div>
+    <p class="{{message}}" *ngIf="message_show == true">{{current_message}}</p>
+</div>

@@ -1,0 +1,4 @@
+<div class="d-flex justify-content-center align-items-center" [class.flex-column]='!inline'>
+	<div class="spinner-grow spinner-grow-sm  {{class}}" style="color: var(--bs-primary);" role="status" *ngIf="loading"></div>
+	<h5 *ngIf='loading && title' [class.ms-2]='inline' class="my-auto">{{title}}</h5>
+</div>

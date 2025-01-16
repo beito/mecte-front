@@ -1,0 +1,9 @@
+<div class="modal-header d-flex align-items-center">
+  <h3 class="text-center w-100 text-primary mb-0">{{decanoID > 0 ? 'Actualizar' : 'Agregar'}} Decano</h3>
+</div>
+
+<div class="modal-body p-4">
+  <div class="text-left">
+    <app-form_render #form_ref [config]="form_config" [data]="decanos"></app-form_render>
+  </div>
+</div>

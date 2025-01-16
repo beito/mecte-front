@@ -1,0 +1,46 @@
+<div class="auth-wrapper align-items-stretch aut-bg-img">
+  <div class="flex-grow-1">
+    <div class="h-100 d-md-flex align-items-center auth-side-img row">
+      <div class="col-sm-10 auth-content w-auto">
+        <a routerLink="/"><img src="assets/images/auth/auth-logo.png" alt="logo" class="img-fluid" /></a>
+        <h2 class="text-white my-4">CREAR NUEVA CUENTA</h2>
+        <h5 class="text-white font-weight-normal">¡Bienvenidos!
+          <br />Este registro es necesario para todos los operadores de la cadena alimentaria de HONDURAS.
+          <br />Usted debe complementar la mayor información de su persona física o jurídica para acceder a todos los servicios del
+          <br />Sistema Nacional de Control de Alimentos.
+        </h5>
+      </div>
+    </div>
+    <div class="auth-side-form">
+      <div class="auth-content">
+        <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+          <a routerLink="/"><img src="assets/images/auth/auth-logo-dark.png" alt="logo" class="img-fluid mb-4 d-block d-xl-none d-lg-none" /></a>
+          <h4 class="mb-3 f-w-400">Crear Cuenta</h4>
+          <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1"><i class="feather icon-user"></i></span>
+            <input type="text" class="form-control" [ngClass]="{ 'is-invalid': submitted && formValues?.['name']?.errors }" formControlName="name" placeholder="Ingresa un nombre de usuario" aria-label="Username" aria-describedby="basic-addon1" />
+          </div>
+          <div class="input-group mb-4">
+            <span class="input-group-text" id="basic-addon2"><i class="feather icon-mail"></i></span>
+            <input type="email" class="form-control" [ngClass]="{ 'is-invalid': submitted && formValues?.['email']?.errors }" formControlName="email" placeholder="Ingresa tu correo" aria-label="email" aria-describedby="basic-addon2" />
+          </div>
+          <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon3"><i class="feather icon-lock"></i></span>
+            <input type="password" class="form-control" [ngClass]="{ 'is-invalid': submitted && formValues?.['password']?.errors }" formControlName="password" placeholder="Ingresa una contraseña" aria-label="password" aria-describedby="basic-addon3" />
+          </div>
+          <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon4"><i class="feather icon-lock"></i></span>
+            <input type="password" class="form-control" [ngClass]="{ 'is-invalid': submitted && formValues?.['confirmpassword']?.errors }" formControlName="confirmpassword" placeholder="Ingresa de nuevo la contraseña" aria-label="password" aria-describedby="basic-addon3" />
+            <span class="minText">La contraseña debe llevar por lo menos: Una Mayúscula, un Número y un Caracter Especial (.@$#)</span>
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-block mb-4">Registrarse</button>
+          </div>
+        </form>
+        <div class="text-center">
+          <p class="mt-4">¿Ya tienes una cuenta? <a [routerLink]="['/auth/signin']" class="f-w-400">¡Haz clic aquí!</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

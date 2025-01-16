@@ -1,0 +1,120 @@
+<!-- eslint-disable @angular-eslint/template/eqeqeq -->
+<div class="d-flex justify-content-between mb-2 pl-2">
+  <h4 *ngIf="configs.title" class="mb-0 no-wrap"><i class="text-primary {{configs.icon}}"></i>&nbsp; {{configs.title}} </h4>
+  <form *ngIf="configs.search" (submit)="update()" class="form-group mb-0">
+    <input
+      name="search_word"
+      id="search_word"
+      placeholder="- Buscar -"
+      [(ngModel)]="filters.search_word"
+      type="text"
+      class="form-control radius">
+  </form>
+</div>
+
+<div>
+  <div class="row">
+    <div class="col-12">
+      <div class="card-box text-center radius" *ngIf="loading || error">
+        <div class="d-flex justify-content-center align-items-center">
+          <div *ngIf='loading || error; then requestholderbig'></div>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <!-- TABLE -->
+        <table *ngIf="!loading && !error && data.list && data.list.length > 0" class="table table-hover table-centered table-borderless datatable-local mb-0" cellspacing="0" id="data-table" role="grid">
+          <!-- HEAD -->
+          <thead>
+            <tr role="row">
+              <th
+                  *ngFor="let header of headers; let i = index;"
+                  (click)='orderBy(header.order_by)'
+                  [class.first]="i == 0"
+                  [class.last]="events.length == 0 && i == headers.length - 1"
+                  [class.selected]='filters.order_by == header.order_by'>
+                {{header.label}}
+                <i *ngIf='filters.order_by == header.order_by' [class.fa-sort-alpha-up]="!filters.order_asc" [class.fa-sort-alpha-down]="filters.order_asc" class="fas"></i>
+              </th>
+              <th style="width:1%;" nowrap class="text-center no-select last options" [colSpan]="events.length" *ngIf="events.length > 0">
+                Opciones
+              </th>
+            </tr>
+          </thead>
+          <!-- / HEAD -->
+
+          <!-- BODY -->
+          <tbody>
+            <tr role="row" *ngFor='let item of data.list; let i = index' class="">
+              <td *ngFor="let header of headers; let i_h = index;" [class.first]="i == data.list.length - 1 && i_h == 0" [class.last]="events.length < 1 && i_h == headers.length - 1 && i == data.list.length - 1" (click)="event('row_click', item, i)">
+                <ng-container *ngIf="header.type != 'date' && header.type != 'disabled'">
+                  {{getItem(item, header.name)}}
+                </ng-container>
+                <ng-container *ngIf="header.type == 'disabled'">
+                  {{getItem(item, header.name) ? 'Deshabilitado' : 'Habilitado'}}
+                </ng-container>
+                <ng-container *ngIf="header.type == 'date'">
+                  {{getItem(item, header.name) | shortDate}}
+                </ng-container>
+              </td>
+              <!-- EVENTS -->
+              <td *ngFor="let e of events; let i_e = index;" [class.last]="i_e == events.length - 1 && i == data.list.length - 1">
+                <div class="d-flex justify-content-center">
+                  <a role="button" *ngIf="!e.disabled || !(e.disabled && e.disabled(item, i)) " (click)="event(e.name || '', item, i)" [title]="e.name" class="px-2"> <i class="{{e.icon}}"></i> </a>
+                  <a role="button" *ngIf="e.disabled && e.disabled(item, i)" [title]="e.name" class="px-2"> <i class="fas fa-minus text-muted"></i> </a>
+                </div>
+              </td>
+              <!-- / EVENTS -->
+            </tr>
+          </tbody>
+          <!-- / BODY -->
+        </table>
+
+        <!-- CUSTOM HOLDER -->
+        <div class="bg-white text-center radius" *ngIf="!loading && !error && (data.list && data.list.length <= 0) || !data.list">
+          <div class="d-flex justify-content-center align-items-center">
+            <app-custom-holder
+                               [icon]='"fa fa-ban text-warning h3"'
+                               [icon_show]='true'
+                               [title]='"h5"'
+                               [title_text]='"No hay " + configs.title'
+                               [title_show]='true'
+                               [inline]="true">
+            </app-custom-holder>
+          </div>
+        </div>
+        <!-- / CUSTOM HOLDER -->
+      </div>
+      <!-- / TABLE -->
+    </div>
+  </div>
+
+  <!-- PAGINATION -->
+  <div class="row mt-2" *ngIf="!loading && !error && data.count && data.count > 0 && configs.paginate">
+
+    <div class="col-sm-12 col-md-12">
+      <div class="dataTables_paginate paging_simple_numbers d-flex" id="data-table_paginate">
+        <ul class="pagination pagination-rounded mx-auto">
+          <li (click)='go(-1)' class="previous" *ngIf='(filters.skip ||0) > 0' id="data-table_previous"><a tabindex="0" class="page-link"><i class="fa fa-chevron-left"></i></a></li>
+          <li *ngIf='possible_indexes[0] >= 0 && possible_indexes[0] <= divider' (click)='go((possible_indexes[0] || 0) - (filters.skip || 0))' class="" [class.active]='filters.skip == possible_indexes[0]'><a tabindex="2" class="page-link">{{possible_indexes[0] + 1}}</a></li>
+          <li *ngIf='possible_indexes[1] >= 0 && possible_indexes[1] <= divider' (click)='go((possible_indexes[1] || 0) - (filters.skip || 0))' class="" [class.active]='filters.skip == possible_indexes[1]'><a tabindex="3" class="page-link">{{possible_indexes[1] + 1}}</a></li>
+          <li *ngIf='possible_indexes[2] >= 0 && possible_indexes[2] <= divider' (click)='go((possible_indexes[2] || 0) - (filters.skip || 0))' class="" [class.active]='filters.skip == possible_indexes[2]'><a tabindex="4" class="page-link">{{possible_indexes[2] + 1}}</a></li>
+          <li *ngIf='possible_indexes[3] >= 0 && possible_indexes[3] <= divider' (click)='go((possible_indexes[3] || 0) - (filters.skip || 0))' class="" [class.active]='filters.skip == possible_indexes[3]'><a tabindex="5" class="page-link">{{possible_indexes[3] + 1}}</a></li>
+          <li *ngIf='possible_indexes[4] >= 0 && possible_indexes[4] <= divider' (click)='go((possible_indexes[4] || 0) - (filters.skip || 0))' class="" [class.active]='filters.skip == possible_indexes[4]'><a tabindex="6" class="page-link">{{possible_indexes[4] + 1}}</a></li>
+          <li *ngIf='possible_indexes[5] >= 0 && possible_indexes[5] <= divider' (click)='go((possible_indexes[5] || 0) - (filters.skip || 0))' class="" [class.active]='filters.skip == possible_indexes[5]'><a tabindex="7" class="page-link">{{possible_indexes[5] + 1}}</a></li>
+          <li *ngIf='possible_indexes[6] >= 0 && possible_indexes[6] <= divider' (click)='go((possible_indexes[6] || 0) - (filters.skip || 0))' class="" [class.active]='filters.skip == possible_indexes[6]'><a tabindex="8" class="page-link">{{possible_indexes[6] + 1}}</a></li>
+          <li (click)='go(1)' class="next" *ngIf='((filters.limit || 0) * (filters.skip || 0)) + (filters.limit || 0) < data.count' id="data-table_next"><a tabindex="8" class="page-link"><i class="fa fa-chevron-right"></i></a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- / PAGINATION -->
+</div>
+
+<ng-template #requestholdersmall>
+  <app-spinner-small [loading]='loading' [class]='"h1"'></app-spinner-small>
+  <app-error-small [error]='!!error' [class]='"h1"'></app-error-small>
+</ng-template>
+<ng-template #requestholderbig>
+  <app-spinner-big [loading]='loading' [title]='"Cargando..."' [inline]="true"></app-spinner-big>
+  <app-error-big [error]='!!error' [title]='error' [inline]="true"></app-error-big>
+</ng-template>

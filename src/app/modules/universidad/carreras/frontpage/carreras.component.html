@@ -1,0 +1,41 @@
+<div class="card">
+  <div class="card-body">
+    <div class="main_container">
+      <div class="generalText">
+        <h1 class="metaTitle" aria-label="Gestión de Carreras">Carreras</h1>
+
+        <div class="d-flex">
+          <button 
+            type="button" 
+            class="btn btn-success ms-auto" 
+            (click)="openModalFile()" 
+            aria-label="Cargar archivo"
+            title="Subir un archivo de carreras">
+            <i class="feather icon-file-text"></i> Cargar
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-primary ms-2" 
+            (click)="openModalForm()" 
+            aria-label="Crear nueva carrera"
+            title="Crear una nueva carrera">
+            <i class="feather icon-plus"></i> Nueva Carrera
+          </button>
+        </div>
+
+        <div class="mt-2">
+          <app-datatable 
+            #datatable_ref
+            (update_datatable)="update($event)"
+            (events_datatable)="events($event)"
+            [in_headers]="datatable.headers"
+            [in_events]="datatable.events"
+            [in_data]="data"
+            [in_filters]="datatable.filters"
+            [in_configs]="datatable.configs">
+          </app-datatable>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

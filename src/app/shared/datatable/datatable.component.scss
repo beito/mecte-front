@@ -1,0 +1,65 @@
+.datatable-local {
+    border-radius: 15px !important;
+
+    thead {
+        background: white;
+        text-align: left !important;
+    }
+
+    tbody {
+        background: white;
+        text-align: left !important;
+    }
+
+    th {
+        border-bottom: 1px solid whitesmoke;
+        font-weight: 500;
+        color: #1d1d1d;
+        cursor: pointer;
+        width: auto;
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+
+        &:hover {
+            color: #1d1d1d;
+        }
+
+        &.selected {
+            font-weight: 900;
+        }
+
+        &.first {
+            border-top-left-radius: 15px;
+        }
+
+        &.last {
+            border-top-right-radius: 15px;
+        }
+
+        &.options {
+            cursor: default !important;
+        }
+    }
+
+    td {
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+
+        &.first {
+            border-bottom-left-radius: 15px;
+        }
+
+        &.last {
+            border-bottom-right-radius: 15px;
+        }
+    }
+}
+
+.pagination-rounded {
+  .page-link {
+    border-radius: 15px !important;
+    margin: 0 3px;
+    border: none;
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,17 @@
+nav .navbar-brand {
+    // remove background color
+    background-color: transparent;
+}
+
+nav {
+    background-color: #dde9fb;
+}
+// add equal width to all navbar items
+nav .navbar-nav .nav-item {
+    width: fit-content;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    a {
+        font-weight: 600;
+    }
+}

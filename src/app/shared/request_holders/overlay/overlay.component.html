@@ -1,0 +1,9 @@
+<div *ngIf='show' class="overlay d-flex justify-content-center align-items-center">
+	<div class="row">
+		<i [ngClass]="[icon, 'display-1 col-12 text-center text-local-aqua fa-spin']"></i>
+		<h1 class="col-12 text-white text-center display-3">
+			{{title}}
+		</h1>
+		<h3 class="col-12 text-white text-center">{{message}}</h3>
+	</div>
+</div>

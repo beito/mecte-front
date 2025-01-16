@@ -1,0 +1,226 @@
+.form-group {
+  margin-bottom: 10px;
+
+  label {
+    width: 100%;
+  }
+}
+
+label {
+  text-align: left !important;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+form {
+  input,
+  textarea,
+  select,
+  .checkbox-item,
+  .radio-item {
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  .checkbox-item,
+  .radio-item {
+    cursor: pointer;
+    i {
+      margin-bottom: 2px;
+    }
+  }
+
+  &.pretty_view {
+    select,
+    input,
+    textarea {
+      border-top: none;
+      border-bottom: 1px solid #ced4daab;
+      border-bottom: none;
+      border-right: none;
+    }
+
+    select {
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+    }
+    select::-ms-expand {
+      display: none !important;
+    }
+  }
+
+  &:not(.pretty_view) {
+    &.submitted {
+      input,
+      textarea,
+      select {
+        &:not(.unstyle) {
+          &:not(:required) {
+            border-bottom: 2px solid #ced4da;
+          }
+
+          &:required {
+            border-bottom: 2px solid var(--bs-primary);
+
+            &:valid,
+            &.valid {
+              border-bottom: 2px solid var(--bs-success);
+            }
+
+            &.ng-invalid,
+            &.invalid,
+            &:invalid {
+              border-bottom: 2px solid var(--bs-danger);
+              border-top: 1px solid var(--bs-danger);
+              border-right: 1px solid var(--bs-danger);
+              border-bottom: 1px solid var(--bs-danger);
+            }
+          }
+        }
+      }
+
+      .checkbox-item,
+      .radio-item {
+        &:not(.required) {
+          i {
+            color: #ced4da;
+          }
+        }
+
+        &.required {
+          i {
+            color: var(--bs-primary);
+          }
+
+          &:valid,
+          &.valid {
+            i {
+              color: var(--bs-success);
+            }
+          }
+
+          &.ng-invalid,
+          &.invalid,
+          &:invalid {
+            i {
+              color: var(--bs-danger);
+            }
+          }
+        }
+      }
+    }
+
+    input,
+    textarea,
+    select {
+      &:not(.unstyle) {
+        &:not(:required) {
+          border-bottom: 2px solid #ced4da;
+        }
+
+        &:required {
+          border-bottom: 2px solid var(--bs-primary);
+        }
+      }
+    }
+
+    .checkbox-item,
+    .radio-item {
+      &:not(.required) {
+        i {
+          color: #ced4da;
+        }
+      }
+
+      &.required {
+        i {
+          color: var(--bs-primary);
+        }
+      }
+    }
+  }
+}
+
+.select-search {
+  .search-toogle {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    transition: width 1s;
+    border: 1px solid #ced4da;
+    border-radius: 0.2rem;
+
+    input {
+      width: 100%;
+      border: none !important;
+      padding-left: 2rem;
+
+      &::placeholder {
+        //text-align: center !important;
+        font-weight: 400 !important;
+      }
+    }
+
+    .fa-search {
+      position: absolute;
+      left: 0.6rem !important;
+      padding-top: 0.55rem !important;
+    }
+  }
+
+  .dropdown-menu {
+    max-width: 50rem;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+
+    ul {
+      max-height: 10rem;
+      overflow-y: auto;
+    }
+  }
+}
+
+.internal-filter {
+  padding: 0.28rem 0.2rem;
+  border-bottom: none;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+
+  &:disabled {
+    appearance: none !important;
+    cursor: default !important;
+  }
+}
+
+.no-border {
+  border-top: none !important;
+  border-bottom: 1px solid #ced4daab !important;
+  border-bottom: none !important;
+  border-right: none !important;
+}
+
+.toogle-carousel {
+  cursor: pointer;
+  margin-bottom: 5px;
+
+  &:not(.show) {
+    border-bottom: 1px solid rgba(102, 200, 200, 0.452);
+  }
+
+  h6 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
+
+  h6,
+  .icon {
+    color: var(--bs-primary) !important;
+  }
+}
+
+.cursor-default {
+  cursor: default !important;
+}

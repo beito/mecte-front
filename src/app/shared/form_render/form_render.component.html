@@ -1,0 +1,652 @@
+<p *ngIf="config.description" style="white-space: pre-line !important;">{{config.description}}</p>
+
+<form *ngIf="config" (ngSubmit)="submit(config.submit)" #form_ref="ngForm" [class.submitted]="form_ref.submitted && submitted" [class.pretty_view]="config.pretty_view ? config.pretty_view() : false">
+  <div class="container-fluid px-0">
+    <div [class]="row.class" *ngFor="let row of config.rows">
+      <ng-container *ngFor="let col of row.cols">
+        <div [class]="col.col_class" *ngIf="col.show ? col.show() : true">
+
+          <ng-container *ngIf="col.type == 'toogle-carousel'">
+            <div class="toogle-carousel d-flex py-1" (click)="data[col.name] = !data[col.name]" [class.show]="data[col.name]">
+              <h6 [class]="(col.class ? col.class : '')">{{col.label}}</h6>
+              <i class="fa fa-angle-up fa-lg my-auto ms-auto icon" [class.fa-angle-up]="data[col.name]" [class.fa-angle-down]="!data[col.name]"></i>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="col.type == 'divider' && (col.toogle ? data[col.toogle] : true)">
+            <hr *ngIf="col.bar" class="my-1 text-center">
+            <h6 [class]="(col.class ? col.class : '') + ' text-muted my-1'">{{col.label}}</h6>
+          </ng-container>
+
+          <ng-container *ngIf="col.type == 'buttons' && (col.toogle ? data[col.toogle] : true)">
+            <div class="d-flex h-100">
+              <ng-container *ngFor="let button of col.buttons">
+                <ng-container *ngIf="button.type=='button' || button.type=='submit'">
+                  <button
+                          *ngIf="button.show ? button.show() : true"
+                          [type]=" button.type"
+                          [class]="button.class"
+                          [disabled]="button.disabled ? button.disabled() : null"
+                          [routerLink]="button.link"
+                          (click)="button.click ? button.click() : null">
+                    <i *ngIf="button.icon && button.icon.position == 'left'"
+                       [class]="button.icon.class + ' me-1'"></i>
+                    {{ button.label }}
+                    <i *ngIf="button.icon && button.icon.position == 'right'"
+                       [class]="button.icon.class + ' ms-1'"></i>
+                  </button>
+                </ng-container>
+
+                <ng-container *ngIf="button.type=='modal_close'">
+                  <button
+                          #btn
+                          *ngIf="button.show ? button.show() : true"
+                          type="button"
+                          [class]="button.class"
+                          [disabled]="button.disabled ? button.disabled() : null"
+                          (click)="close_modal(button.click ? button.click() : null)">
+
+                    <i *ngIf="button.icon && button.icon.position == 'left'"
+                       [class]="button.icon.class + ' me-1'"></i>
+                    {{ button.label }}
+                    <i *ngIf="button.icon && button.icon.position == 'right'"
+                       [class]="button.icon.class + ' ms-1'"></i>
+                  </button>
+                </ng-container>
+              </ng-container>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="col.type == 'tags' && (col.toogle ? data[col.toogle] : true)">
+            <label *ngIf="col.label">{{col.label}} <small *ngIf="col.small">{{col.small}}</small></label>
+            <div [class]="(col.class ? col.class : '') + ' '">
+              <div class="d-flex">
+                <div class="px-2 py-1 bg-light d-flex me-1" style="white-space: nowrap; border-radius: 15px;" *ngFor="let item of col.list; let i = index;">
+                  <div class="my-auto">
+                    {{item.label}}
+                  </div>
+
+                  <a *ngIf="item.remove" class="pointer ms-2 my-auto" (click)="item.remove(i)">
+                    <i class="fa fa-times text-dark"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
+          <div *ngIf="col.type != 'divider' && col.type != 'toogle-carousel' && col.type != 'tags' && col.type != 'buttons' && (col.toogle ? data[col.toogle] : true)" class="form-group">
+            <label *ngIf="(col.show ? col.show() : true) && col.label">{{col.label}}
+              <small *ngIf="col.small">{{col.small}}</small>
+              <i
+                 *ngIf="col.tooltip && ((col.tooltip.show && col.tooltip.show()) || !col.tooltip.show)"
+                 [tooltipClass]="col.tooltip.class + ' tooltip-unimed'"
+                 [class]="col.tooltip.icon"
+                 [ngbTooltip]="col.tooltip.text"
+                 [openDelay]="300"
+                 [closeDelay]="500"
+                 [autoClose]="'outside'"
+                 container="body">
+              </i>
+            </label>
+            <p *ngIf="col.description" style="white-space: pre-line !important;font-size: smaller !important;">{{col.description}}</p>
+
+            <ng-container *ngIf="col.type == 'password'">
+              <input
+                     #input_ref="ngModel"
+
+                     [class.touched]="input_ref.touched"
+                     [class.invalid]="(input_ref.invalid || col.validators && col.validators.custom && col.validators.custom.value()) && (input_ref.touched || form_ref.submitted)"
+
+                     [maxlength]="col.validators && col.validators.maxlength ? col.validators.maxlength.value() : null"
+                     [minlength]="col.validators && col.validators.minlength ? col.validators.minlength.value() : null"
+                     [required]="col.validators && col.validators.required ? col.validators.required.value() : false"
+                     [pattern]="col.validators && col.validators.pattern ? col.validators.pattern.value() : null"
+                     [placeholder]="col.placeholder ? col.placeholder() : ''"
+
+                     type="password"
+                     [class]="(col.class ? col.class : '') + ' form-control form-control-sm'"
+                     [name]="col.name"
+                     [id]="col.name"
+
+                     [(ngModel)]="data[col.name]"
+                     [disabled]="col.disabled() || (config.disabled ? config.disabled() : false)"
+
+                     (change)="col.change ? col.change($event) : null"
+                     (paste)="col.paste ? col.paste($event) : null"
+                     (keypress)="col.keypress ? col.keypress($event) : null"
+                     (input)="col.input ? col.input($event) : null">
+            </ng-container>
+
+            <ng-container *ngIf="col.type == 'text'">
+              <div class="input-group">
+                <input
+                       #input_ref="ngModel"
+
+                       [class.touched]="input_ref.touched"
+                       [class.invalid]="input_ref.invalid && (input_ref.touched || form_ref.submitted)"
+
+                       [maxlength]="col.validators && col.validators.maxlength ? col.validators.maxlength.value() : null"
+                       [minlength]="col.validators && col.validators.minlength ? col.validators.minlength.value() : null"
+                       [required]="col.validators && col.validators.required ? col.validators.required.value() : false"
+                       [pattern]="col.validators && col.validators.pattern ? col.validators.pattern.value() : null"
+                       [placeholder]="col.placeholder ? col.placeholder() : ''"
+
+                       type="text"
+                       [class]="(col.class ? col.class : '') + ' form-control form-control-sm'"
+                       [name]="col.name"
+                       [id]="col.name"
+
+                       [(ngModel)]="data[col.name]"
+                       [disabled]="col.disabled() || (config.disabled ? config.disabled() : false)"
+
+                       (change)="col.change ? col.change($event) : null"
+                       (paste)="col.paste ? col.paste($event) : null"
+                       (keypress)="col.keypress ? col.keypress($event) : null"
+                       (input)="col.input ? col.input($event) : null">
+
+                <div class="input-group-prepend" *ngIf="col.filter">
+                  <select
+                          [(ngModel)]="data[col.filter.name]"
+                          [name]="col.filter.name"
+                          [id]="col.filter.name"
+                          [disabled]="(col.filter.disabled ? col.filter.disabled() : false) || (config.disabled ? config.disabled() : false)"
+                          (change)="col.filter.change ? col.filter.change($event) : null"
+                          [class.no-border]="col.filter.no_border"
+                          class="form-control form-control-sm unstyle internal-filter">
+                    <option *ngFor="let item of col.filter.list()" [value]="item[col.filter.value]" [title]="col.filter.tooltip?item[col.filter.tooltip]:null">{{item[col.filter.text]}}</option>
+                  </select>
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="col.type == 'name'">
+              <input
+                     #input_ref="ngModel"
+
+                     [class.touched]="input_ref.touched"
+                     [class.invalid]="input_ref.invalid && (input_ref.touched || form_ref.submitted)"
+
+                     [maxlength]="col.validators && col.validators.maxlength ? col.validators.maxlength.value() : ''"
+                     [minlength]="col.validators && col.validators.minlength ? col.validators.minlength.value() : ''"
+                     [required]="col.validators && col.validators.required ? col.validators.required.value() : false"
+                     [pattern]="col.validators && col.validators.pattern ? col.validators.pattern.value() : ''"
+
+                     type="text"
+                     [class]="(col.class ? col.class : '') + ' form-control form-control-sm'"
+                     [name]="col.name"
+                     [placeholder]="col.placeholder ? col.placeholder() : ''"
+                     [id]="col.name"
+                     [title]="col.name"
+
+                     [(ngModel)]="data[col.name]"
+                     [disabled]="col.disabled() || (config.disabled ? config.disabled() : false)"
+
+                     (change)="col.change ? col.change($event) : null"
+                     (paste)="input_name_stuff.paste($event, col.paste)"
+                     (keypress)="input_name_stuff.keypress($event, col.keypress)"
+                     (input)="col.input ? col.input($event) : null">
+            </ng-container>
+
+            <ng-container *ngIf="col.type == 'select'">
+              <ng-container *ngIf="!((config.pretty_view ? config.pretty_view() : false) && !data[col.name])">
+                <select
+                        #input_ref="ngModel"
+
+                        [class.touched]="input_ref.touched"
+                        [class.invalid]="input_ref.invalid && (input_ref.touched || form_ref.submitted)"
+
+                        [required]="col.validators && col.validators.required ? col.validators.required.value() : false"
+
+                        [class]="(col.class ? col.class : '') + ' form-control form-control-sm'"
+                        [name]="col.name"
+                        [id]="col.name"
+
+                        [(ngModel)]="data[col.name]"
+                        [disabled]="col.disabled() || (config.disabled ? config.disabled() : false)"
+
+                        (change)="col.change ? col.change($event) : null">
+                  <option value="" disabled>{{col.placeholder ? col.placeholder() : "- Seleccione -"}}</option>
+                  <option style="display: none !important;" value="null" disabled>{{col.placeholder ? col.placeholder() : "- Seleccione -"}}</option>
+                  <option style="display: none !important;" value="0" disabled>{{col.placeholder ? col.placeholder() : "- Seleccione -"}}</option>
+                  <option *ngFor="let item of col.catalog.list()" [value]="item[col.catalog.value]">{{item[col.catalog.text]}}</option>
+                </select>
+              </ng-container>
+              <ng-container *ngIf="(config.pretty_view ? config.pretty_view() : false) && !data[col.name]">
+                <input
+                       #input_ref="ngModel"
+
+                       [required]="col.validators && col.validators.required ? col.validators.required.value() : false"
+
+                       type="text"
+                       [class]="(col.class ? col.class : '') + ' form-control form-control-sm'"
+                       [name]="col.name"
+                       [id]="col.name"
+                       [title]="col.name"
+
+                       [(ngModel)]="data[col.name]"
+                       [disabled]="col.disabled() || (config.disabled ? config.disabled() : false)">
+              </ng-container>
+            </ng-container>
+
+            <ng-container *ngIf="col.type == 'phone'">
+              <input
+                     #input_ref="ngModel"
+
+                     [class.touched]="input_ref.touched"
+                     [class.invalid]="input_ref.invalid && (input_ref.touched || form_ref.submitted)"
+
+                     [maxlength]="col.validators && col.validators.maxlength ? col.validators.maxlength.value() : ''"
+                     [required]="col.validators && col.validators.required ? col.validators.required.value() : false"
+
+                     [minlength]="col.hn() ? 8 : 1"
+                     [textMask]="{mask: col.hn() ? hn_phone_mask : number_mask}"
+                     pattern="^[0-9-]*$"
+
+                     type="text"
+                     [class]="(col.class ? col.class : '') + ' form-control form-control-sm'"
+                     [name]="col.name"
+                     [placeholder]="col.placeholder ? col.placeholder() : ''"
+                     [id]="col.name"
+                     [title]="col.name"
+
+                     [(ngModel)]="data[col.name]"
+                     [disabled]="col.disabled() || (config.disabled ? config.disabled() : false)"
+
+                     (change)="col.change ? col.change($event) : null"
+                     (paste)="col.paste ? col.paste($event) : null"
+                     (keypress)="col.keypress ? col.keypress($event) : null"
+                     (input)="col.input ? col.input($event) : null">
+            </ng-container>
+
+            <ng-container *ngIf="col.type == 'identification'">
+              <input
+                     #input_ref="ngModel"
+
+                     [class.touched]="input_ref.touched"
+                     [class.invalid]="input_ref.invalid && (input_ref.touched || form_ref.submitted) || (col.validators && col.validators.custom && !col.validators.custom.value(data[col.name]))"
+
+                     [maxlength]="col.validators && col.validators.maxlength ? col.validators.maxlength.value() : ''"
+                     [required]="col.validators && col.validators.required ? col.validators.required.value() : false"
+
+                     [minlength]="col.hn() ? 15 : 1"
+                     [textMask]="{mask: col.hn() ? hn_identification_mask : number_mask}"
+                     pattern="^[0-9-]*$"
+
+                     type="text"
+                     [class]="(col.class ? col.class : '') + ' form-control form-control-sm'"
+                     [name]="col.name"
+                     [placeholder]="col.placeholder ? col.placeholder() : ''"
+                     [id]="col.name"
+                     [title]="col.name"
+
+                     [(ngModel)]="data[col.name]"
+                     [disabled]="col.disabled() || (config.disabled ? config.disabled() : false)"
+
+                     (change)="col.change ? col.change($event) : null"
+                     (paste)="col.paste ? col.paste($event) : null"
+                     (keypress)="col.keypress ? col.keypress($event) : null"
+                     (input)="col.input ? col.input($event) : null">
+            </ng-container>
+
+            <ng-container *ngIf="col.type == 'calendar'">
+              <div class="input-group">
+                <input
+                  #calendarInput
+                  type="text"
+                  [placeholder]="col.placeholder ? col.placeholder() : ''"
+                  [class]="(col.class ? col.class : '') + ' form-control form-control-sm'"
+                  [name]="col.name"
+                  [id]="col.name"
+                  [(ngModel)]="data[col.name]"
+                  [disabled]="col.disabled() || (config.disabled ? config.disabled() : false)"
+                />
+              </div>
+            </ng-container>                 
+
+            <ng-container *ngIf="col.type == 'calendar-month'">
+              <div class="input-group">
+                <input
+                  #monthInput
+                  type="text"
+                  [placeholder]="col.placeholder ? col.placeholder() : ''"
+                  [class]="(col.class ? col.class : '') + ' form-control form-control-sm'"
+                  [name]="col.name"
+                  [id]="col.name"
+                  [(ngModel)]="data[col.name]"
+                  [disabled]="col.disabled() || (config.disabled ? config.disabled() : false)"
+                />
+              </div>
+            </ng-container>                      
+
+            <ng-container *ngIf="col.type == 'textarea'">
+              <textarea
+                        #input_ref="ngModel"
+
+                        [class.touched]="input_ref.touched"
+                        [class.invalid]="input_ref.invalid && (input_ref.touched || form_ref.submitted)"
+
+                        [maxlength]="col.validators && col.validators.maxlength ? col.validators.maxlength.value() : null"
+                        [minlength]="col.validators && col.validators.minlength ? col.validators.minlength.value() : null"
+                        [required]="col.validators && col.validators.required ? col.validators.required.value() : false"
+                        [pattern]="col.validators && col.validators.pattern ? col.validators.pattern.value() : null"
+                        [placeholder]="col.placeholder ? col.placeholder() : ''"
+
+                        style="resize: none;"
+                        [rows]="col.rows"
+                        [class]="(col.class ? col.class : '') + ' form-control form-control-sm'"
+                        [name]="col.name"
+                        [id]="col.name"
+
+                        [(ngModel)]="data[col.name]"
+                        [disabled]="col.disabled() || (config.disabled ? config.disabled() : false)"
+
+                        (change)="col.change ? col.change($event) : null"
+                        (paste)="col.paste ? col.paste($event) : null"
+                        (keypress)="col.keypress ? col.keypress($event) : null"
+                        (input)="col.input ? col.input($event) : null"></textarea>
+            </ng-container>
+
+            <ng-container *ngIf="col.type == 'email'">
+              <input
+                     #input_ref="ngModel"
+
+                     [class.touched]="input_ref.touched"
+                     [class.invalid]="(input_ref.invalid && (input_ref.touched || form_ref.submitted)) || !valid_email(data[col.name])"
+
+                     maxlength="254"
+                     minlength="5"
+                     [required]="col.validators  && col.validators.required ? col.validators.required.value() : false"
+                     [textMask]="email_mask"
+                     [placeholder]="col.placeholder ? col.placeholder() : ''"
+
+                     type="text"
+                     [class]="(col.class ? col.class : '') + ' form-control form-control-sm'"
+                     [name]="col.name"
+                     [id]="col.name"
+
+                     [(ngModel)]="data[col.name]"
+                     [disabled]="col.disabled() || (config.disabled ? config.disabled() : false)"
+
+                     (change)="col.change ? col.change($event) : null"
+                     (paste)="col.paste ? col.paste($event) : null"
+                     (keypress)="col.keypress ? col.keypress($event) : null"
+                     (input)="col.input ? col.input($event) : null">
+            </ng-container>
+
+            <ng-container *ngIf="col.type == 'number'">
+              <div class="input-group">
+                <input
+                       #input_ref="ngModel"
+
+                       [class.touched]="input_ref.touched"
+                       [class.invalid]="input_ref.invalid && (input_ref.touched || form_ref.submitted)"
+
+                       [maxlength]="col.validators && col.validators.maxlength ? col.validators.maxlength.value() : null"
+                       [minlength]="col.validators && col.validators.minlength ? col.validators.minlength.value() : null"
+                       [required]="col.validators && col.validators.required ? col.validators.required.value() : false"
+                       [textMask]="{mask: number_mask}"
+                       pattern="^\d*$"
+                       [placeholder]="col.placeholder ? col.placeholder() : ''"
+
+                       type="text"
+                       [class]="(col.class ? col.class : '') + ' form-control form-control-sm'"
+                       [name]="col.name"
+                       [id]="col.name"
+
+                       [(ngModel)]="data[col.name]"
+                       [disabled]="col.disabled() || (config.disabled ? config.disabled() : false)"
+
+                       (change)="col.change ? col.change($event) : null"
+                       (paste)="col.paste ? col.paste($event) : null"
+                       (keypress)="col.keypress ? col.keypress($event) : null"
+                       (input)="col.input ? col.input($event) : null">
+                <div class="input-group-prepend" *ngIf="col.filter">
+                  <select
+                          [(ngModel)]="data[col.filter.name]"
+                          [name]="col.filter.name"
+                          [id]="col.filter.name"
+                          [disabled]="(col.filter.disabled ? col.filter.disabled() : false) || (config.disabled ? config.disabled() : false)"
+                          (change)="col.filter.change ? col.filter.change($event) : null"
+                          [class.no-border]="col.filter.no_border"
+                          class="form-control form-control-sm unstyle internal-filter">
+                    <option *ngFor="let item of col.filter.list()" [value]="item[col.filter.value]" [title]="col.filter.tooltip?item[col.filter.tooltip]:null">{{item[col.filter.text]}}</option>
+                  </select>
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="col.type == 'integer'">
+              <input
+                     #input_ref="ngModel"
+
+                     [class.touched]="input_ref.touched"
+                     [class.invalid]="input_ref.invalid && (input_ref.touched || form_ref.submitted)"
+
+                     [maxlength]="col.validators && col.validators.maxlength ? col.validators.maxlength.value() : null"
+                     [minlength]="col.validators && col.validators.minlength ? col.validators.minlength.value() : null"
+                     [required]="col.validators && col.validators.required ? col.validators.required.value() : false"
+                     [textMask]="{mask: integer_mask}"
+                     pattern="^\d{1,3}(,\d{3})*(\.\d+)?$"
+                     [placeholder]="col.placeholder ? col.placeholder() : ''"
+
+                     type="text"
+                     [class]="(col.class ? col.class : '') + ' form-control form-control-sm'"
+                     [name]="col.name"
+                     [id]="col.name"
+
+                     [(ngModel)]="data[col.name]"
+                     [disabled]="col.disabled() || (config.disabled ? config.disabled() : false)"
+
+                     (change)="col.change ? col.change($event) : null"
+                     (paste)="col.paste ? col.paste($event) : null"
+                     (keypress)="col.keypress ? col.keypress($event) : null"
+                     (input)="col.input ? col.input($event) : null">
+            </ng-container>
+
+            <ng-container *ngIf="col.type == 'decimal'">
+              <div class="input-group">
+                <input
+                       #input_ref="ngModel"
+
+                       [class.touched]="input_ref.touched"
+                       [class.invalid]="input_ref.invalid && (input_ref.touched || form_ref.submitted)"
+
+                       [max]="col.validators && col.validators.max ? col.validators.max.value() : null"
+                       [min]="col.validators && col.validators.min ? col.validators.min.value() : null"
+                       [maxlength]="col.validators && col.validators.maxlength ? col.validators.maxlength.value() : null"
+                       [minlength]="col.validators && col.validators.minlength ? col.validators.minlength.value() : null"
+                       [required]="col.validators && col.validators.required ? col.validators.required.value() : false"
+                       [textMask]="{mask: decimal_mask}"
+                       pattern="^\d{1,3}(,\d{3})*(\.\d+)?$"
+                       [placeholder]="col.placeholder ? col.placeholder() : ''"
+
+                       type="text"
+                       [class]="(col.class ? col.class : '') + ' form-control form-control-sm'"
+                       [name]="col.name"
+                       [id]="col.name"
+
+                       [(ngModel)]="data[col.name]"
+                       [disabled]="col.disabled() || (config.disabled ? config.disabled() : false)"
+
+                       (change)="col.change ? col.change($event) : null"
+                       (paste)="col.paste ? col.paste($event) : null"
+                       (keypress)="col.keypress ? col.keypress($event) : null"
+                       (input)="col.input ? col.input($event) : null">
+
+                <div class="input-group-prepend" *ngIf="col.filter">
+                  <select
+                          [(ngModel)]="data[col.filter.name]"
+                          [name]="col.filter.name"
+                          [id]="col.filter.name"
+                          [disabled]="(col.filter.disabled ? col.filter.disabled() : false) || (config.disabled ? config.disabled() : false)"
+                          (change)="col.filter.change ? col.filter.change($event) : null"
+                          class="form-control form-control-sm unstyle internal-filter">
+                    <option *ngFor="let item of col.filter.list()" [value]="item[col.filter.value]" [title]="col.filter.tooltip?item[col.filter.tooltip]:null">{{item[col.filter.text]}}</option>
+                  </select>
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="col.type == 'money'">
+              <div class="input-group">
+                <input
+                       #input_ref="ngModel"
+
+                       [class.touched]="input_ref.touched"
+                       [class.invalid]="input_ref.invalid && (input_ref.touched || form_ref.submitted)"
+
+                       [maxlength]="col.validators && col.validators.maxlength ? col.validators.maxlength.value() : null"
+                       [minlength]="col.validators && col.validators.minlength ? col.validators.minlength.value() : null"
+                       [required]="col.validators && col.validators.required ? col.validators.required.value() : false"
+                       [textMask]="{mask: money_mask}"
+                       pattern="^L \d{1,3}(,\d{3})*(\.\d+)?$"
+                       [placeholder]="col.placeholder ? col.placeholder() : ''"
+
+                       type="text"
+                       [class]="(col.class ? col.class : '') + ' form-control form-control-sm'"
+                       [name]="col.name"
+                       [id]="col.name"
+
+                       [(ngModel)]="data[col.name]"
+                       [disabled]="col.disabled() || (config.disabled ? config.disabled() : false)"
+
+                       (change)="col.change ? col.change($event) : null"
+                       (paste)="col.paste ? col.paste($event) : null"
+                       (keypress)="col.keypress ? col.keypress($event) : null"
+                       (input)="col.input ? col.input($event) : null">
+
+                <div class="input-group-prepend" *ngIf="col.filter">
+                  <select
+                          [(ngModel)]="data[col.filter.name]"
+                          [name]="col.filter.name"
+                          [id]="col.filter.name"
+                          [disabled]="(col.filter.disabled ? col.filter.disabled() : false) || (config.disabled ? config.disabled() : false)"
+                          (change)="col.filter.change ? col.filter.change($event) : null"
+                          class="form-control form-control-sm unstyle internal-filter">
+                    <option *ngFor="let item of col.filter.list()" [value]="item[col.filter.value]">{{item[col.filter.text]}}</option>
+                  </select>
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="col.type == 'radio'">
+              <div [class]="(col.class ? col.class : '') + ' d-flex'">
+                <a
+                   [id]="col.name"
+                   [class]="(col.disabled() || (config.disabled ? config.disabled() : false) ? ' disabled ' : '') + (col.validators && col.validators.required && col.validators.required.value() ? (' required ' + (!data[col.name] ? ' invalid ' : ' valid ')) : '') + ' checkbox-item d-flex my-auto me-2'"
+                   (click)="col.disabled() || (config.disabled ? config.disabled() : false) ? false : data[col.name] = item[col.catalog.value]; col.change ? col.change($event) : null"
+                   *ngFor="let item of col.catalog.list()">
+                  <i class="fa fa-circle me-2 mt-auto"
+                     *ngIf="data[col.name] != item[col.catalog.value]"></i>
+                  <i class="fa fa-check-circle fa-swap-opacity me-2 mt-auto"
+                     *ngIf="data[col.name] == item[col.catalog.value]"></i>
+
+                  <div class="mt-auto text text-secondary">
+                    {{item[col.catalog.text]}}
+                  </div>
+                </a>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="col.type == 'checkbox'">
+              <div class="d-flex flex-column">
+                <a
+                   [id]="col.name"
+                   [class]="(col.class ? col.class : '') + (col.disabled() || (config.disabled ? config.disabled() : false) ? ' disabled ' : '') + (col.validators && col.validators.required && col.validators.required.value() ? (' required ' + ((!data[col.name] || (data[col.name] && data[col.name].length < 1)) ? ' invalid ' : ' valid ')) : '') + ' checkbox-item d-flex my-auto '"
+                   (click)="col.disabled() || (config.disabled ? config.disabled() : false) ? false : (data[col.name] = checkbox_check(data[col.name], item[col.catalog.value])); (col.change ? col.change($event) : null)"
+                   *ngFor="let item of col.catalog.list()">
+                  <i class="fa fa-square me-2 my-auto"
+                     *ngIf="!checkbox_is_checked(data[col.name], item[col.catalog.value])"></i>
+                  <i class="fa fa-check-square fa-swap-opacity me-2 my-auto"
+                     *ngIf="checkbox_is_checked(data[col.name], item[col.catalog.value])"></i>
+
+                  <div>
+                    {{item[col.catalog.text]}}
+                  </div>
+                </a>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="col.type == 'upload'">
+              <ng-container *ngIf="!(config.pretty_view && config.pretty_view())">
+                <ngx-file-drop
+                               [class]="(col.class ? col.class : '') + (col.disabled() || (config.disabled ? config.disabled() : false) ? ' disabled ' : '') + (col.validators && col.validators.required && col.validators.required.value() ? (' required ' + ((!data[col.name] || (data[col.name] && data[col.name].length < 1)) ? ' invalid ' : ' valid ')) : '') + ' upload-input'"
+                               dropZoneLabel="Arrastre aquí o "
+                               (onFileDrop)="data[col.name] = upload_amount(dropped($event), col.amount); col.change($event);"
+                               (onFileOver)="fileOver($event)"
+                               (onFileLeave)="fileLeave($event)"
+                               accept="{{col.accept}}">
+                  <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+                    Arrastre aquí o
+                    <button type="button" class="btn btn-primary ms-2" (click)="openFileSelector()">Seleccione archivo</button>
+                  </ng-template>
+                </ngx-file-drop>
+                <div class="mt-2 d-flex flex-column px-2" *ngIf="data[col.name]">
+                  <div class="d-flex" *ngFor="let item of data[col.name]; let upload_index = index">
+                    <div class="my-auto">
+                      {{item.relativePath}}
+                    </div>
+
+                    <div class="my-auto ms-auto">
+                      <a class="pointer" (click)="data[col.name] = delete_upload(data[col.name], upload_index)">
+                        <i class="fa fa-times text-danger"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="config.pretty_view && config.pretty_view()">
+                <div class="d-flex flex-column px-2" *ngIf="data[col.name]">
+                  <div class="d-flex" *ngFor="let item of data[col.name]">
+                    <a class="my-auto" target="_black" [href]="get_upload_url(col.path, item)">
+                      {{item}}
+                    </a>
+                  </div>
+                </div>
+              </ng-container>
+            </ng-container>
+
+            <ng-container *ngIf="col.type == 'select-search' && (col.show ? col.show() : true)">
+              <div class="dropdown select-search">
+                <span class="search-toogle">
+                  <i class="fa fa-search"></i>
+                  <input
+                         #input_ref
+                         [(ngModel)]="input_ref.s_value"
+                         id="search_word"
+                         name="search_word"
+                         type="search"
+                         class="form-control-sm unstyle"
+                         (change)="col.change($event)"
+                         (input)="col.input ? col.input($event) : null"
+                         (paste)="col.paste ? col.paste($event) : null"
+                         (keypress)="col.keypress ? col.keypress($event) : null"
+                         [placeholder]="col.placeholder ? col.placeholder() : ''"
+                         autocomplete="off">
+                </span>
+
+                <div #dropdown_ref class="dropdown-menu" [class.show]="input_ref.s_value">
+                  <ul class="list-group list-group-flush" *ngIf="!(col.loading && col.loading()) && col.catalog.list().length > 0">
+                    <li class="list-group-item list-group-item-action pointer" *ngFor="let item of col.catalog.list()" (click)="data[col.name]=item[col.catalog.value]; col.select(item); input_ref.s_value=''">
+                      {{item[col.catalog.text]}}
+                    </li>
+                  </ul>
+                  <div class="p-2" *ngIf="!(col.loading && col.loading()) && col.catalog.list().length < 1">
+                    <i class="fa fa-exclamation-circle me-1 text-muted"></i>
+                    No se encontró coincidencias
+                  </div>
+                  <div class="p-2" *ngIf="(col.loading && col.loading())">
+                    <i class="fa fa-spinner-third fa-spin-pulse me-1 text-primary"></i>
+                    Buscando coincidencias
+                  </div>
+                </div>
+              </div>
+
+            </ng-container>
+
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</form>

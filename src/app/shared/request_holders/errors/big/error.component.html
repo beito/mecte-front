@@ -1,0 +1,4 @@
+<div class="d-flex justify-content-center align-items-center" [class.flex-column]='!inline'>
+	<i class="fa fa-alert-circle text-danger display-1 animated fadeIn delay-3s {{class}}" *ngIf="error"></i>
+	<h2 [class.ms-2] = 'inline' *ngIf="error && title">{{title}}</h2>
+</div>
