@@ -4,9 +4,9 @@
   "author": "",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "node server.js",
     "start:server": "cd ../competencias-backend/ && npm start",
-    "build": "ng build",
+    "build": "ng build --prod",
     "fi": "npm install --force",
     "build-prod": "ng build --configuration production --base-href /",
     "watch": "ng build --watch --configuration development",
